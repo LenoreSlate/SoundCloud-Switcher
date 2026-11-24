@@ -1,8 +1,10 @@
 import {
   LOCKED,
   getLocal,
+  type Accounts,
   type Action,
   type Box,
+  type ExportFile,
   type Local,
   type Message,
   type Profile,
@@ -156,6 +158,7 @@ const handlers: { [K in Action]: (r: Message<K>) => Promise<Reply<K>> } = {
   SAVE_ACTIVE_ACCOUNT: (r) => handleManualSave(r.name),
   DELETE_ACCOUNT: (r) => handleDeleteAccount(r.name),
   IMPORT_ACCOUNTS: (r) => handleImportAccounts(r.file, r.passphrase),
+  EXPORT_ACCOUNTS: () => handleExportAccounts(),
   GET_CURRENT_SC_PROFILE: () => detectCurrentProfile(),
   GET_VAULT_STATE: () => getVaultState(),
   UNLOCK: (r) => handleUnlock(r.passphrase),
@@ -450,8 +453,43 @@ async function handleDeleteAccount(name: string | undefined): Promise<Reply<"DEL
   return { success: true };
 }
 
+// Export : un seul bloc chiffré avec la clé du coffre ; le sel et le témoin
+// ("vault") permettent de le rouvrir avec la passphrase, et rien d'autre.
+async function handleExportAccounts(): Promise<Reply<"EXPORT_ACCOUNTS">> {
+  const { sc_accounts = {}, sc_vault } = await getLocal("sc_accounts", "sc_vault");
+  if (Object.keys(sc_accounts).length === 0) {
+    return { success: false, error: "Aucun profil à exporter" };
+  }
+  // Déverrouillé => coffre créé et anciennes sessions en clair déjà migrées.
+  const key = await requireKey();
+  if (!sc_vault) throw new Error(LOCKED);
+
+  const accounts: Accounts = {};
+  for (const [name, acc] of Object.entries(sc_accounts)) {
+    if (!acc.secret) continue;
+    accounts[name] = {
+      name: acc.name,
+      username: acc.username,
+      avatarUrl: acc.avatarUrl,
+      permalinkUrl: acc.permalinkUrl,
+      secret: acc.secret,
+      savedAt: acc.savedAt
+    };
+  }
+
+  const file: ExportFile = {
+    app: "SC_Account_Switcher",
+    version: chrome.runtime.getManifest().version,
+    exportedAt: new Date().toISOString(),
+    vault: sc_vault,
+    data: await encryptJson(key, accounts)
+  };
+  return { success: true, file, count: Object.keys(accounts).length };
+}
+
 // Importation de comptes sauvegardés.
-// Fichier chiffré (v1.2+) : déchiffré avec la passphrase du fichier.
+// Fichier entièrement chiffré (v1.3+, champ "data") ou à cookies chiffrés
+// (v1.2, champ "accounts") : déchiffré avec la passphrase du fichier.
 // Ancien fichier en clair (v1.1.0) : accepté pour migration, mais nettoyé.
 // Tout le contenu du fichier est non fiable : chaque champ est revérifié.
 const MAX_IMPORT_ACCOUNTS = 50;
@@ -466,8 +504,6 @@ async function handleImportAccounts(file: unknown, passphrase: unknown): Promise
   const key = await requireKey();
   const invalid = { success: false, error: "Format de fichier invalide." } as const;
   if (!isRecord(file)) return invalid;
-  const imported = file.accounts || file;
-  if (!isRecord(imported)) return invalid;
 
   let fileKey: CryptoKey | null = null;
   if (file.vault) {
@@ -480,6 +516,17 @@ async function handleImportAccounts(file: unknown, passphrase: unknown): Promise
       return { success: false, error: "Passphrase du fichier incorrecte." };
     }
   }
+
+  let imported: unknown = file.accounts || file;
+  if (file.data) {
+    if (!fileKey) return invalid;
+    try {
+      imported = await decryptJson(fileKey, file.data as Box);
+    } catch {
+      return invalid;
+    }
+  }
+  if (!isRecord(imported)) return invalid;
 
   const { sc_accounts: existing = {} } = await getLocal("sc_accounts");
   const now = new Date().toISOString();

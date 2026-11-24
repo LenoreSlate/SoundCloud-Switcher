@@ -1,4 +1,4 @@
-import { LOCKED, getLocal, type Accounts, type Message, type Reply } from "./shared.js";
+import { LOCKED, getLocal, type Message, type Reply } from "./shared.js";
 
 // DOM Elements (tous présents dans popup.html)
 const byId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -195,44 +195,16 @@ async function deleteAccount(name: string) {
   loadAccounts();
 }
 
-// Exporter les profils en JSON. Les cookies restent chiffrés : le fichier ne
-// s'ouvre qu'avec la passphrase du coffre (sel + témoin inclus dans "vault").
+// Exporter les profils en JSON, entièrement chiffré par le background : le
+// fichier ne s'ouvre qu'avec la passphrase du coffre.
 async function handleExportAccounts() {
-  let data = await getLocal("sc_accounts", "sc_vault");
-  if (Object.keys(data.sc_accounts || {}).length === 0) {
-    showStatus("Aucun profil à exporter", "error");
+  const res = await call({ action: "EXPORT_ACCOUNTS" });
+  if (!res?.success) {
+    showStatus(errorText(res, "Erreur lors de l'export"), "error");
     return;
   }
 
-  // Jamais d'export en clair : chiffrer d'abord les anciennes sessions.
-  const hasPlaintext = Object.values(data.sc_accounts || {}).some((a) => !a.secret);
-  if (!data.sc_vault || hasPlaintext) {
-    if (!(await unlockFlow())) return;
-    data = await getLocal("sc_accounts", "sc_vault");
-  }
-
-  const accounts: Accounts = {};
-  for (const [name, acc] of Object.entries(data.sc_accounts || {})) {
-    if (!acc.secret) continue;
-    accounts[name] = {
-      name: acc.name,
-      username: acc.username,
-      avatarUrl: acc.avatarUrl,
-      permalinkUrl: acc.permalinkUrl,
-      secret: acc.secret,
-      savedAt: acc.savedAt
-    };
-  }
-
-  const payload = {
-    app: "SC_Account_Switcher",
-    version: chrome.runtime.getManifest().version,
-    exportedAt: new Date().toISOString(),
-    vault: data.sc_vault,
-    accounts
-  };
-
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(res.file, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -242,7 +214,7 @@ async function handleExportAccounts() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  showStatus(`${Object.keys(accounts).length} profil(s) exporté(s) (chiffré)`, "success");
+  showStatus(`${res.count} profil(s) exporté(s) (chiffré)`, "success");
 }
 
 // Importer des profils depuis un fichier JSON

@@ -25,6 +25,16 @@ export type Account = {
 };
 export type Accounts = Record<string, Account>;
 
+// Fichier de sauvegarde (v1.3+) : tout le contenu des comptes est dans `data`,
+// chiffré avec la clé du coffre. Seuls l'app, la version et la date restent lisibles.
+export type ExportFile = {
+  app: string;
+  version: string;
+  exportedAt: string;
+  vault: Vault;
+  data: Box;
+};
+
 // Contenu de chrome.storage.local
 export type Local = {
   sc_vault?: Vault;
@@ -47,6 +57,7 @@ export type Api = {
   SAVE_ACTIVE_ACCOUNT: [{ name: string }, Ok & { name: string; profile: Profile | null }];
   DELETE_ACCOUNT: [{ name: string }, Ok];
   IMPORT_ACCOUNTS: [{ file: unknown; passphrase: string | null }, Ok & { count: number }];
+  EXPORT_ACCOUNTS: [{}, Ok & { file: ExportFile; count: number }];
   GET_CURRENT_SC_PROFILE: [
     {},
     (Ok & { authenticated: true; profile: Profile | null }) | { success: false; authenticated: false }

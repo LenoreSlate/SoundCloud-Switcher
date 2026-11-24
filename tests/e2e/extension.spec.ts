@@ -111,7 +111,9 @@ test("coffre, bascule, verrouillage, export et import", async ({ context, sw, po
     for await (const chunk of stream) backup += chunk;
     expect(backup).not.toContain(TOKEN_A);
     expect(backup).not.toContain(TOKEN_B);
-    expect(Object.keys(JSON.parse(backup).accounts).sort()).toEqual(["Alpha", "Beta"]);
+    expect(backup).not.toContain("Alpha");
+    expect(backup).not.toContain("Beta");
+    expect(JSON.parse(backup).data.ct).toBeTruthy();
   });
 
   await test.step("passphrase oubliée : réinitialisation", async () => {

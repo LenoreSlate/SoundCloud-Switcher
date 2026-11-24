@@ -21,7 +21,7 @@ const jar = [];
 const setCalls = [];
 const noop = async () => {};
 const chrome = {
-  runtime: { id: "ext", getURL: (p) => `chrome-extension://ext/${p}`, onMessage: ev("msg"), onInstalled: ev("inst"), onStartup: ev("start") },
+  runtime: { id: "ext", getManifest: () => ({ version: "test" }), getURL: (p) => `chrome-extension://ext/${p}`, onMessage: ev("msg"), onInstalled: ev("inst"), onStartup: ev("start") },
   cookies: { onChanged: ev("cookie"), getAll: async () => jar.slice(), set: async (d) => { setCalls.push(d); }, remove: noop },
   storage: { local: makeArea(), session: makeArea() },
   action: { setBadgeText: noop, setBadgeBackgroundColor: noop },
@@ -84,15 +84,24 @@ const evilCookie = { name: "x", value: "1", domain: ".evilsoundcloud.com", path:
   assert.strictEqual(injected.value, TOKEN);
   assert.ok(injected.secure && injected.url.startsWith("https://"));
 
-  // Export (même format que la popup) : chiffré, réimportable avec la passphrase.
+  // Export : entièrement chiffré (ni token, ni nom, ni pseudo), réimportable avec la passphrase.
+  const exported = await send({ action: "EXPORT_ACCOUNTS" });
+  assert.strictEqual(exported.count, 1);
+  const backup = JSON.parse(JSON.stringify(exported.file));
+  assert.deepStrictEqual(Object.keys(backup).sort(), ["app", "data", "exportedAt", "vault", "version"]);
+  for (const secret of [TOKEN, '"A"', '"a"']) {
+    assert.ok(!JSON.stringify(backup).includes(secret), `${secret} en clair dans l'export`);
+  }
+  // Format v1.2 (cookies chiffrés, métadonnées en clair) : toujours importable.
   const local = chrome.storage.local.raw;
-  const backup = JSON.parse(JSON.stringify({ vault: local.sc_vault, accounts: local.sc_accounts }));
-  assert.ok(!JSON.stringify(backup).includes(TOKEN), "token en clair dans l'export");
+  const oldBackup = JSON.parse(JSON.stringify({ vault: local.sc_vault, accounts: local.sc_accounts }));
 
   await send({ action: "RESET_VAULT" });
   await send({ action: "UNLOCK", passphrase: "another passphrase" });
   assert.strictEqual((await send({ action: "IMPORT_ACCOUNTS", file: backup, passphrase: "nope" })).success, false);
+  assert.strictEqual((await send({ action: "IMPORT_ACCOUNTS", file: { ...backup, data: { iv: "AAAA", ct: "AAAA" } }, passphrase: "correct horse" })).success, false);
   assert.strictEqual((await send({ action: "IMPORT_ACCOUNTS", file: backup, passphrase: "correct horse" })).count, 1);
+  assert.strictEqual((await send({ action: "IMPORT_ACCOUNTS", file: oldBackup, passphrase: "correct horse" })).count, 1);
   setCalls.length = 0;
   assert.strictEqual((await send({ action: "SWITCH_ACCOUNT", accountName: "A" })).success, true);
   assert.strictEqual(setCalls.find((c) => c.name === "oauth_token").value, TOKEN);
