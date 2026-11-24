@@ -1,5 +1,14 @@
 // Vérifications de sécurité du background compilé, sans navigateur : npm test
 import assert from "node:assert";
+import { readFileSync } from "node:fs";
+
+// chrome.i18n en français, avec la même substitution des placeholders que le navigateur.
+const fr = JSON.parse(readFileSync(new URL("../_locales/fr/messages.json", import.meta.url), "utf8"));
+function getMessage(key, subs = []) {
+  const entry = fr[key];
+  if (!entry) return "";
+  return entry.message.replace(/\$(\w+)\$/g, (_, n) => subs[Number(entry.placeholders[n.toLowerCase()].content.slice(1)) - 1]);
+}
 
 function makeArea() {
   const data = {};
@@ -26,7 +35,8 @@ const chrome = {
   storage: { local: makeArea(), session: makeArea() },
   action: { setBadgeText: noop, setBadgeBackgroundColor: noop },
   tabs: { query: async () => [], create: noop, update: noop, reload: noop },
-  windows: { update: noop }
+  windows: { update: noop },
+  i18n: { getMessage }
 };
 
 globalThis.chrome = chrome;

@@ -70,3 +70,6 @@ export type Api = {
 export type Action = keyof Api;
 export type Message<K extends Action = Action> = { [A in K]: { action: A } & Api[A][0] }[K];
 export type Reply<K extends Action> = Api[K][1] | Failure;
+
+// Texte traduit dans la langue du navigateur (_locales/<langue>/messages.json).
+export const t = (key: string, ...subs: (string | number)[]): string => chrome.i18n.getMessage(key, subs.map(String));

@@ -1,6 +1,7 @@
 import {
   LOCKED,
   getLocal,
+  t,
   type Accounts,
   type Action,
   type Box,
@@ -95,7 +96,7 @@ async function getVaultState(): Promise<Reply<"GET_VAULT_STATE">> {
 // comptes stockés en clair (v1.1.0).
 async function handleUnlock(passphrase: unknown): Promise<Reply<"UNLOCK">> {
   if (typeof passphrase !== "string" || !passphrase) {
-    return { success: false, error: "Passphrase requise." };
+    return { success: false, error: t("passRequired") };
   }
 
   const { sc_vault, sc_accounts = {} } = await getLocal("sc_vault", "sc_accounts");
@@ -106,11 +107,11 @@ async function handleUnlock(passphrase: unknown): Promise<Reply<"UNLOCK">> {
     try {
       await decryptJson(key, sc_vault.check);
     } catch {
-      return { success: false, error: "Passphrase incorrecte." };
+      return { success: false, error: t("passWrong") };
     }
   } else {
     if (passphrase.length < MIN_PASSPHRASE) {
-      return { success: false, error: `Passphrase trop courte (${MIN_PASSPHRASE} caractères min.).` };
+      return { success: false, error: t("passTooShort", MIN_PASSPHRASE) };
     }
     const salt = crypto.getRandomValues(new Uint8Array(16));
     key = await deriveKey(passphrase, salt);
@@ -398,7 +399,7 @@ async function handleManualSave(preferredName: string | undefined): Promise<Repl
   if (!hasSoundcloudAuthCookie(cookies)) {
     return {
       success: false,
-      error: "Aucune session active détectée. Connectez-vous d'abord sur SoundCloud."
+      error: t("noSession")
     };
   }
 
@@ -411,7 +412,7 @@ async function handleManualSave(preferredName: string | undefined): Promise<Repl
     finalName = profile.username;
   }
   if (!finalName || finalName === "__proto__") {
-    finalName = "Compte SoundCloud";
+    finalName = t("defaultAccountName");
   }
 
   const { sc_accounts: accounts = {} } = await getLocal("sc_accounts");
@@ -438,7 +439,7 @@ async function handleManualSave(preferredName: string | undefined): Promise<Repl
 // Suppression d'un compte
 async function handleDeleteAccount(name: string | undefined): Promise<Reply<"DELETE_ACCOUNT">> {
   const cleanName = (name || "").trim();
-  if (!cleanName) return { success: false, error: "Nom invalide." };
+  if (!cleanName) return { success: false, error: t("invalidName") };
 
   const { sc_accounts: accounts = {}, sc_active_account } = await getLocal("sc_accounts", "sc_active_account");
   delete accounts[cleanName];
@@ -458,7 +459,7 @@ async function handleDeleteAccount(name: string | undefined): Promise<Reply<"DEL
 async function handleExportAccounts(): Promise<Reply<"EXPORT_ACCOUNTS">> {
   const { sc_accounts = {}, sc_vault } = await getLocal("sc_accounts", "sc_vault");
   if (Object.keys(sc_accounts).length === 0) {
-    return { success: false, error: "Aucun profil à exporter" };
+    return { success: false, error: t("nothingToExport") };
   }
   // Déverrouillé => coffre créé et anciennes sessions en clair déjà migrées.
   const key = await requireKey();
@@ -502,7 +503,7 @@ function cleanText(value: unknown, max: number): string {
 
 async function handleImportAccounts(file: unknown, passphrase: unknown): Promise<Reply<"IMPORT_ACCOUNTS">> {
   const key = await requireKey();
-  const invalid = { success: false, error: "Format de fichier invalide." } as const;
+  const invalid = { success: false, error: t("invalidFormat") } as const;
   if (!isRecord(file)) return invalid;
 
   let fileKey: CryptoKey | null = null;
@@ -513,7 +514,7 @@ async function handleImportAccounts(file: unknown, passphrase: unknown): Promise
       fileKey = await deriveKey(String(passphrase || ""), fromB64(vault.salt));
       await decryptJson(fileKey, vault.check);
     } catch {
-      return { success: false, error: "Passphrase du fichier incorrecte." };
+      return { success: false, error: t("filePassWrong") };
     }
   }
 
@@ -561,7 +562,7 @@ async function handleImportAccounts(file: unknown, passphrase: unknown): Promise
   }
 
   if (count === 0) {
-    return { success: false, error: "Aucun profil valide trouvé dans le fichier importé." };
+    return { success: false, error: t("noValidProfile") };
   }
 
   await chrome.storage.local.set({ sc_accounts: existing });
@@ -590,13 +591,13 @@ async function handleSwitchAccount(targetName: string) {
 
     const targetAccount = Object.hasOwn(accounts, targetName) ? accounts[targetName] : null;
     if (!targetAccount?.secret) {
-      throw new Error(`Le compte "${targetName}" est introuvable.`);
+      throw new Error(t("accountNotFound", targetName));
     }
 
     // Déchiffrer AVANT de toucher aux cookies : un échec ne déconnecte personne.
     const targetCookies = await decryptJson(key, targetAccount.secret);
     if (!Array.isArray(targetCookies)) {
-      throw new Error(`Le compte "${targetName}" est corrompu.`);
+      throw new Error(t("accountCorrupt", targetName));
     }
 
     // 1. Vider les cookies existants

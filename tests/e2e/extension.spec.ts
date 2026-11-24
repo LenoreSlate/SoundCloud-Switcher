@@ -16,12 +16,16 @@ const TOKEN_A = "2-111111-aaaaaa-TOKEN-ALPHA";
 const TOKEN_B = "2-222222-bbbbbb-TOKEN-BETA";
 const PASS = "correct horse battery";
 
-const test = base.extend<{ context: BrowserContext; sw: Worker; popup: Page }>({
-  context: async ({ headless }, use) => {
+const test = base.extend<{ lang: string; context: BrowserContext; sw: Worker; popup: Page }>({
+  // Langue de l'interface Chromium : il faut locale ET --lang (LANGUAGE pour Linux).
+  lang: ["fr", { option: true }],
+  context: async ({ headless, lang }, use) => {
     const context = await chromium.launchPersistentContext("", {
       ...(executablePath ? { executablePath } : { channel: "chromium" }),
       headless,
-      args: [`--disable-extensions-except=${EXTENSION}`, `--load-extension=${EXTENSION}`]
+      locale: lang,
+      env: { ...process.env, LANGUAGE: lang },
+      args: [`--lang=${lang}`, `--disable-extensions-except=${EXTENSION}`, `--load-extension=${EXTENSION}`]
     });
     await context.route(/^https?:\/\/([^/]+\.)?soundcloud\.com\//, (route) =>
       route.fulfill({ status: 200, contentType: "text/html", body: "<title>SoundCloud (bouchon)</title>" })
@@ -144,3 +148,21 @@ test("coffre, bascule, verrouillage, export et import", async ({ context, sw, po
     expect(JSON.stringify(await storage())).not.toContain(TOKEN_A);
   });
 });
+
+// Interface traduite selon la langue du navigateur (fr est couvert ci-dessus).
+const UI = {
+  en: { save: "Save", savedAccounts: "Saved accounts" },
+  es: { save: "Guardar", savedAccounts: "Cuentas guardadas" },
+  de: { save: "Speichern", savedAccounts: "Gespeicherte Konten" },
+  "zh-CN": { save: "保存", savedAccounts: "已保存的账号" }
+};
+for (const [lang, ui] of Object.entries(UI)) {
+  test.describe(lang, () => {
+    test.use({ lang });
+    test(`interface en ${lang}`, async ({ popup }) => {
+      await expect(popup.locator("#saveBtn")).toHaveText(ui.save);
+      await expect(popup.locator(".section-title")).toHaveText(ui.savedAccounts);
+      await expect(popup.locator("html")).toHaveAttribute("lang", new RegExp(`^${lang}`));
+    });
+  });
+}

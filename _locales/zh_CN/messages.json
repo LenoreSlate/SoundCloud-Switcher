@@ -1,0 +1,256 @@
+{
+  "extName": {
+    "message": "SoundCloud Switcher"
+  },
+  "extDescription": {
+    "message": "一键切换多个 SoundCloud 账号。"
+  },
+  "subtitle": {
+    "message": "多账号管理"
+  },
+  "namePlaceholder": {
+    "message": "账号名称（留空自动识别）..."
+  },
+  "save": {
+    "message": "保存"
+  },
+  "saveTitle": {
+    "message": "保存当前会话"
+  },
+  "savedAccounts": {
+    "message": "已保存的账号"
+  },
+  "noAccounts": {
+    "message": "暂无已保存的账号"
+  },
+  "logout": {
+    "message": "退出登录"
+  },
+  "logoutTitle": {
+    "message": "退出当前会话"
+  },
+  "openSoundcloud": {
+    "message": "SoundCloud"
+  },
+  "openSoundcloudTitle": {
+    "message": "打开 SoundCloud"
+  },
+  "export": {
+    "message": "导出"
+  },
+  "exportTitle": {
+    "message": "导出加密的账号备份"
+  },
+  "import": {
+    "message": "导入"
+  },
+  "importTitle": {
+    "message": "从备份文件恢复账号"
+  },
+  "confirmPassPlaceholder": {
+    "message": "确认密码短语"
+  },
+  "forgotPass": {
+    "message": "忘记密码短语？"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "ok": {
+    "message": "确定"
+  },
+  "passMismatch": {
+    "message": "两次输入的密码短语不一致"
+  },
+  "resetConfirm": {
+    "message": "删除所有已保存的账号和密码短语？此操作无法撤销。"
+  },
+  "vaultReset": {
+    "message": "保险库已重置"
+  },
+  "unlockTitle": {
+    "message": "输入密码短语以解锁会话"
+  },
+  "createTitle": {
+    "message": "设置一个密码短语（至少 8 个字符）来加密你的会话。它无法找回。"
+  },
+  "unlockError": {
+    "message": "解锁失败"
+  },
+  "locked": {
+    "message": "会话已锁定"
+  },
+  "loggedOut": {
+    "message": "已退出 SoundCloud"
+  },
+  "logoutError": {
+    "message": "退出登录失败"
+  },
+  "detected": {
+    "message": "已检测到：$USERNAME$",
+    "placeholders": {
+      "username": {
+        "content": "$1"
+      }
+    }
+  },
+  "nameTooLong": {
+    "message": "名称过长（最多 50 个字符）"
+  },
+  "detecting": {
+    "message": "正在识别 SoundCloud 账号..."
+  },
+  "accountSaved": {
+    "message": "账号“$NAME$”已保存",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "saveError": {
+    "message": "保存失败"
+  },
+  "switching": {
+    "message": "正在切换到“$NAME$”...",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "activeStatus": {
+    "message": "当前账号：$NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "switchError": {
+    "message": "切换失败"
+  },
+  "deleteConfirm": {
+    "message": "删除账号“$NAME$”？",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "accountDeleted": {
+    "message": "账号“$NAME$”已删除",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportError": {
+    "message": "导出失败"
+  },
+  "exported": {
+    "message": "已导出 $COUNT$ 个账号（已加密）",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "fileTooLarge": {
+    "message": "文件过大"
+  },
+  "invalidJson": {
+    "message": "JSON 文件无效"
+  },
+  "filePassTitle": {
+    "message": "备份文件的密码短语"
+  },
+  "imported": {
+    "message": "已导入 $COUNT$ 个账号",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "invalidFormat": {
+    "message": "文件格式无效。"
+  },
+  "activeAccount": {
+    "message": "当前账号"
+  },
+  "active": {
+    "message": "当前"
+  },
+  "activate": {
+    "message": "切换"
+  },
+  "switchToLabel": {
+    "message": "切换到 $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "delete": {
+    "message": "删除"
+  },
+  "deleteLabel": {
+    "message": "删除账号 $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "passRequired": {
+    "message": "需要输入密码短语。"
+  },
+  "passWrong": {
+    "message": "密码短语错误。"
+  },
+  "passTooShort": {
+    "message": "密码短语太短（至少 $MIN$ 个字符）。",
+    "placeholders": {
+      "min": {
+        "content": "$1"
+      }
+    }
+  },
+  "noSession": {
+    "message": "未检测到活动会话。请先登录 SoundCloud。"
+  },
+  "defaultAccountName": {
+    "message": "SoundCloud 账号"
+  },
+  "invalidName": {
+    "message": "名称无效。"
+  },
+  "nothingToExport": {
+    "message": "没有可导出的账号"
+  },
+  "filePassWrong": {
+    "message": "备份文件的密码短语错误。"
+  },
+  "noValidProfile": {
+    "message": "导入的文件中没有有效的账号。"
+  },
+  "accountNotFound": {
+    "message": "找不到账号“$NAME$”。",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "accountCorrupt": {
+    "message": "账号“$NAME$”已损坏。",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  }
+}
