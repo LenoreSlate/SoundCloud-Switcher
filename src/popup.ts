@@ -135,7 +135,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   exportBtn.addEventListener("click", handleExportAccounts);
 
-  importBtn.addEventListener("click", () => importFileInput.click());
+  importBtn.addEventListener("click", async () => {
+    // Firefox ferme la popup dès que le sélecteur de fichier s'ouvre, et
+    // l'import est perdu : on rouvre la même page dans un onglet pour importer.
+    if (location.protocol === "moz-extension:" && !(await chrome.tabs.getCurrent())) {
+      await chrome.tabs.create({ url: location.href });
+      window.close();
+      return;
+    }
+    importFileInput.click();
+  });
   importFileInput.addEventListener("change", handleImportFile);
 
   // Anciennes sessions stockées en clair (v1.1.0) : chiffrer au plus vite.

@@ -25,9 +25,9 @@ jobs:
         run: |
           version="v$(node -p 'require("./manifest.json").version')"
           [ "$version" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME != manifest $version"; exit 1; }
-      - run: npm run build
-      - name: Zip de l'extension
-        run: zip -r "soundcloud-switcher-$GITHUB_REF_NAME.zip" manifest.json popup.html popup.css icons _locales dist LICENSE
+      - run: npm run package
+      - name: Zip de l'extension (Chrome et Firefox)
+        run: cd build && zip -r "../soundcloud-switcher-$GITHUB_REF_NAME.zip" .
       - name: GitHub Release
         run: gh release create "$GITHUB_REF_NAME" soundcloud-switcher-*.zip --title "SoundCloud Switcher $GITHUB_REF_NAME" --generate-notes
         env:
