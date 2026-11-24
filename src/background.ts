@@ -163,8 +163,9 @@ const handlers: { [K in Action]: (r: Message<K>) => Promise<Reply<K>> } = {
 };
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  // Uniquement nos propres pages (popup), jamais un onglet / content script.
-  if (sender.id !== chrome.runtime.id || sender.tab) return;
+  // Uniquement nos propres pages (chrome-extension://<id>/…), jamais une page
+  // web ni un content script : sender.url est fixé par le navigateur.
+  if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(chrome.runtime.getURL(""))) return;
   if (!request || !Object.hasOwn(handlers, request.action)) return;
 
   const handler = handlers[request.action as Action] as (r: Message) => Promise<unknown>;

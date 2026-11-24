@@ -4,9 +4,11 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "tsc && node tests/security.test.js"
+    "test": "tsc && node tests/security.test.js",
+    "test:e2e": "tsc && playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@types/chrome": "^0.3.7",
     "typescript": "^7.0.2"
   }

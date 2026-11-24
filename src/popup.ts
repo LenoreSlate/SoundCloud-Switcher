@@ -105,10 +105,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadAccounts();
   checkCurrentSoundCloudSession();
 
-  // Anciennes sessions stockées en clair (v1.1.0) : chiffrer au plus vite.
-  const state = await send({ action: "GET_VAULT_STATE" });
-  if (state?.success && state.hasLegacy) unlockFlow().then(loadAccounts);
-
   saveBtn.addEventListener("click", handleSaveAccount);
   accountNameInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
@@ -135,6 +131,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   importBtn.addEventListener("click", () => importFileInput.click());
   importFileInput.addEventListener("change", handleImportFile);
+
+  // Anciennes sessions stockées en clair (v1.1.0) : chiffrer au plus vite.
+  // Après les écouteurs, sinon les clics faits avant la réponse sont perdus.
+  const state = await send({ action: "GET_VAULT_STATE" });
+  if (state?.success && state.hasLegacy) unlockFlow().then(loadAccounts);
 });
 
 // Pré-détecte la session SoundCloud active pour aider l'utilisateur
