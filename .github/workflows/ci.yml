@@ -19,6 +19,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Type-check et tests de sécurité
         run: npm test
+      - name: Lint Firefox (web-ext)
+        run: npm run lint:firefox
       - name: Test de bout en bout dans Chromium
         run: npx playwright test
       - uses: actions/upload-artifact@v4
