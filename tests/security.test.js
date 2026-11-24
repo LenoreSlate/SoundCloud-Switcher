@@ -1,8 +1,5 @@
-// Vérifications de sécurité du background, sans navigateur : node tests/security.test.js
-const fs = require("fs");
-const path = require("path");
-const vm = require("vm");
-const assert = require("assert");
+// Vérifications de sécurité du background compilé, sans navigateur : npm test
+import assert from "node:assert";
 
 function makeArea() {
   const data = {};
@@ -32,11 +29,9 @@ const chrome = {
   windows: { update: noop }
 };
 
-const ctx = vm.createContext({
-  chrome, crypto: globalThis.crypto, TextEncoder, TextDecoder, btoa, atob, console,
-  setTimeout, clearTimeout, fetch: async () => ({ ok: false })
-});
-vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "background.js"), "utf8"), ctx);
+globalThis.chrome = chrome;
+globalThis.fetch = async () => ({ ok: false });
+const { sanitizeCookie } = await import("../dist/background.js");
 
 function send(msg, sender = { id: "ext" }) {
   return new Promise((resolve) => {
@@ -55,10 +50,10 @@ const evilCookie = { name: "x", value: "1", domain: ".evilsoundcloud.com", path:
   assert.strictEqual(await send({ action: "constructor" }), undefined);
 
   // Cookies : domaine SoundCloud seulement, Secure forcé, storeId ignoré.
-  assert.strictEqual(ctx.sanitizeCookie(evilCookie), null);
-  assert.strictEqual(ctx.sanitizeCookie({ ...goodCookie, domain: "soundcloud.com.evil.com" }), null);
-  assert.strictEqual(ctx.sanitizeCookie({ ...goodCookie, value: "a;b" }), null);
-  const clean = ctx.sanitizeCookie(goodCookie);
+  assert.strictEqual(sanitizeCookie(evilCookie), null);
+  assert.strictEqual(sanitizeCookie({ ...goodCookie, domain: "soundcloud.com.evil.com" }), null);
+  assert.strictEqual(sanitizeCookie({ ...goodCookie, value: "a;b" }), null);
+  const clean = sanitizeCookie(goodCookie);
   assert.strictEqual(clean.secure, true);
   assert.strictEqual(clean.storeId, undefined);
 
