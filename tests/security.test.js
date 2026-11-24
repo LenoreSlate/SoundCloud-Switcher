@@ -21,7 +21,7 @@ const jar = [];
 const setCalls = [];
 const noop = async () => {};
 const chrome = {
-  runtime: { id: "ext", onMessage: ev("msg"), onInstalled: ev("inst"), onStartup: ev("start") },
+  runtime: { id: "ext", getURL: (p) => `chrome-extension://ext/${p}`, onMessage: ev("msg"), onInstalled: ev("inst"), onStartup: ev("start") },
   cookies: { onChanged: ev("cookie"), getAll: async () => jar.slice(), set: async (d) => { setCalls.push(d); }, remove: noop },
   storage: { local: makeArea(), session: makeArea() },
   action: { setBadgeText: noop, setBadgeBackgroundColor: noop },
@@ -33,7 +33,9 @@ globalThis.chrome = chrome;
 globalThis.fetch = async () => ({ ok: false });
 const { sanitizeCookie } = await import("../dist/background.js");
 
-function send(msg, sender = { id: "ext" }) {
+const POPUP = { id: "ext", url: "chrome-extension://ext/popup.html" };
+
+function send(msg, sender = POPUP) {
   return new Promise((resolve) => {
     if (listeners.msg(msg, sender, resolve) !== true) resolve(undefined);
   });
@@ -44,9 +46,12 @@ const goodCookie = { name: "oauth_token", value: TOKEN, domain: ".soundcloud.com
 const evilCookie = { name: "x", value: "1", domain: ".evilsoundcloud.com", path: "/" };
 
 (async () => {
-  // Messages : seule la popup de l'extension est écoutée.
-  assert.strictEqual(await send({ action: "GET_VAULT_STATE" }, { id: "ext", tab: { id: 1 } }), undefined);
-  assert.strictEqual(await send({ action: "GET_VAULT_STATE" }, { id: "other" }), undefined);
+  // Messages : seules les pages de l'extension sont écoutées (pas un content script ni une page web).
+  assert.strictEqual(await send({ action: "GET_VAULT_STATE" }, { id: "ext", tab: { id: 1 }, url: "https://soundcloud.com/" }), undefined);
+  assert.strictEqual(await send({ action: "GET_VAULT_STATE" }, { id: "ext", url: "https://chrome-extension.evil/ext/" }), undefined);
+  assert.strictEqual(await send({ action: "GET_VAULT_STATE" }, { id: "ext" }), undefined);
+  assert.strictEqual(await send({ action: "GET_VAULT_STATE" }, { ...POPUP, id: "other" }), undefined);
+  assert.strictEqual((await send({ action: "GET_VAULT_STATE" }, { ...POPUP, tab: { id: 1 } })).success, true);
   assert.strictEqual(await send({ action: "constructor" }), undefined);
 
   // Cookies : domaine SoundCloud seulement, Secure forcé, storeId ignoré.
