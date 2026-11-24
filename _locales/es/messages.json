@@ -1,0 +1,256 @@
+{
+  "extName": {
+    "message": "SoundCloud Switcher"
+  },
+  "extDescription": {
+    "message": "Cambia entre varias cuentas de SoundCloud con un solo clic."
+  },
+  "subtitle": {
+    "message": "Gestor de varias cuentas"
+  },
+  "namePlaceholder": {
+    "message": "Nombre de la cuenta (o auto)..."
+  },
+  "save": {
+    "message": "Guardar"
+  },
+  "saveTitle": {
+    "message": "Guardar la sesión activa"
+  },
+  "savedAccounts": {
+    "message": "Cuentas guardadas"
+  },
+  "noAccounts": {
+    "message": "No hay cuentas guardadas"
+  },
+  "logout": {
+    "message": "Cerrar sesión"
+  },
+  "logoutTitle": {
+    "message": "Cerrar la sesión activa"
+  },
+  "openSoundcloud": {
+    "message": "SoundCloud"
+  },
+  "openSoundcloudTitle": {
+    "message": "Abrir SoundCloud"
+  },
+  "export": {
+    "message": "Exportar"
+  },
+  "exportTitle": {
+    "message": "Exportar una copia de seguridad cifrada de tus perfiles"
+  },
+  "import": {
+    "message": "Importar"
+  },
+  "importTitle": {
+    "message": "Restaurar perfiles desde un archivo de copia de seguridad"
+  },
+  "confirmPassPlaceholder": {
+    "message": "Confirma la frase de contraseña"
+  },
+  "forgotPass": {
+    "message": "¿Olvidaste la frase de contraseña?"
+  },
+  "cancel": {
+    "message": "Cancelar"
+  },
+  "ok": {
+    "message": "Aceptar"
+  },
+  "passMismatch": {
+    "message": "Las frases de contraseña no coinciden"
+  },
+  "resetConfirm": {
+    "message": "¿Eliminar todas las cuentas guardadas y la frase de contraseña? Esta acción no se puede deshacer."
+  },
+  "vaultReset": {
+    "message": "Almacén restablecido"
+  },
+  "unlockTitle": {
+    "message": "Frase de contraseña para desbloquear tus sesiones"
+  },
+  "createTitle": {
+    "message": "Elige una frase de contraseña (mín. 8 caracteres) para cifrar tus sesiones. No se puede recuperar."
+  },
+  "unlockError": {
+    "message": "Error al desbloquear"
+  },
+  "locked": {
+    "message": "Sesiones bloqueadas"
+  },
+  "loggedOut": {
+    "message": "Sesión de SoundCloud cerrada"
+  },
+  "logoutError": {
+    "message": "Error al cerrar sesión"
+  },
+  "detected": {
+    "message": "Detectado: $USERNAME$",
+    "placeholders": {
+      "username": {
+        "content": "$1"
+      }
+    }
+  },
+  "nameTooLong": {
+    "message": "Nombre demasiado largo (máx. 50 caracteres)"
+  },
+  "detecting": {
+    "message": "Detectando el perfil de SoundCloud..."
+  },
+  "accountSaved": {
+    "message": "Cuenta \"$NAME$\" guardada",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "saveError": {
+    "message": "Error al guardar"
+  },
+  "switching": {
+    "message": "Cambiando a \"$NAME$\"...",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "activeStatus": {
+    "message": "Activa: $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "switchError": {
+    "message": "Error al cambiar de cuenta"
+  },
+  "deleteConfirm": {
+    "message": "¿Eliminar la cuenta \"$NAME$\"?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "accountDeleted": {
+    "message": "Cuenta \"$NAME$\" eliminada",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportError": {
+    "message": "Error al exportar"
+  },
+  "exported": {
+    "message": "$COUNT$ perfil(es) exportado(s) (cifrado)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "fileTooLarge": {
+    "message": "Archivo demasiado grande"
+  },
+  "invalidJson": {
+    "message": "Archivo JSON no válido"
+  },
+  "filePassTitle": {
+    "message": "Frase de contraseña del archivo de copia de seguridad"
+  },
+  "imported": {
+    "message": "$COUNT$ cuenta(s) importada(s)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "invalidFormat": {
+    "message": "Formato de archivo no válido."
+  },
+  "activeAccount": {
+    "message": "Cuenta activa"
+  },
+  "active": {
+    "message": "Activa"
+  },
+  "activate": {
+    "message": "Activar"
+  },
+  "switchToLabel": {
+    "message": "Cambiar a $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "delete": {
+    "message": "Eliminar"
+  },
+  "deleteLabel": {
+    "message": "Eliminar la cuenta $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "passRequired": {
+    "message": "Se requiere una frase de contraseña."
+  },
+  "passWrong": {
+    "message": "Frase de contraseña incorrecta."
+  },
+  "passTooShort": {
+    "message": "Frase de contraseña demasiado corta (mín. $MIN$ caracteres).",
+    "placeholders": {
+      "min": {
+        "content": "$1"
+      }
+    }
+  },
+  "noSession": {
+    "message": "No se detectó ninguna sesión activa. Inicia sesión en SoundCloud primero."
+  },
+  "defaultAccountName": {
+    "message": "Cuenta de SoundCloud"
+  },
+  "invalidName": {
+    "message": "Nombre no válido."
+  },
+  "nothingToExport": {
+    "message": "No hay perfiles para exportar"
+  },
+  "filePassWrong": {
+    "message": "Frase de contraseña del archivo incorrecta."
+  },
+  "noValidProfile": {
+    "message": "No se encontró ningún perfil válido en el archivo importado."
+  },
+  "accountNotFound": {
+    "message": "No se encuentra la cuenta \"$NAME$\".",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "accountCorrupt": {
+    "message": "La cuenta \"$NAME$\" está dañada.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  }
+}

@@ -26,6 +26,11 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* L'attribut hidden doit gagner sur les display: flex des composants. */
+[hidden] {
+  display: none !important;
+}
+
 body {
   width: 340px;
   background-color: var(--bg-main);
@@ -126,6 +131,7 @@ input[type="text"]:focus {
 /* Buttons */
 .btn {
   display: inline-flex;
+  white-space: nowrap;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-subtle);
@@ -477,6 +483,7 @@ input[type="password"]:focus {
   display: flex;
   gap: 6px;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .pass-actions .btn-text {

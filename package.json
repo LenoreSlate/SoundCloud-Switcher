@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "tsc && node tests/security.test.js",
+    "test": "tsc && node tests/security.test.js && node tests/locales.test.js",
     "test:e2e": "tsc && playwright test"
   },
   "devDependencies": {

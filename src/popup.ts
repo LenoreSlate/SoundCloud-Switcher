@@ -1,4 +1,4 @@
-import { LOCKED, getLocal, type Message, type Reply } from "./shared.js";
+import { LOCKED, getLocal, t, type Message, type Reply } from "./shared.js";
 
 // DOM Elements (tous présents dans popup.html)
 const byId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -21,6 +21,12 @@ const passError = byId<HTMLParagraphElement>("passError");
 const passReset = byId<HTMLButtonElement>("passReset");
 
 const MAX_IMPORT_BYTES = 1_000_000;
+
+// Textes statiques de popup.html : data-i18n (texte), data-i18n-title, data-i18n-placeholder.
+document.documentElement.lang = chrome.i18n.getUILanguage();
+for (const el of document.querySelectorAll<HTMLElement>("[data-i18n]")) el.textContent = t(el.dataset.i18n!);
+for (const el of document.querySelectorAll<HTMLElement>("[data-i18n-title]")) el.title = t(el.dataset.i18nTitle!);
+for (const el of document.querySelectorAll<HTMLInputElement>("[data-i18n-placeholder]")) el.placeholder = t(el.dataset.i18nPlaceholder!);
 
 // Message typé vers le background.
 function send<M extends Message>(message: M): Promise<Reply<M["action"]> | undefined> {
@@ -53,15 +59,15 @@ passForm.addEventListener("submit", (e) => {
   const submitter = e.submitter as HTMLButtonElement | null;
   if (submitter?.value === "ok" && !passConfirm.hidden && passInput.value !== passConfirm.value) {
     e.preventDefault();
-    passError.textContent = "Les passphrases ne correspondent pas";
+    passError.textContent = t("passMismatch");
   }
 });
 
 passReset.addEventListener("click", async () => {
-  if (!confirm("Supprimer tous les comptes enregistrés et la passphrase ? Cette action est définitive.")) return;
+  if (!confirm(t("resetConfirm"))) return;
   await send({ action: "RESET_VAULT" });
   passDialog.close("cancel");
-  showStatus("Coffre réinitialisé", "success");
+  showStatus(t("vaultReset"), "success");
   loadAccounts();
 });
 
@@ -74,13 +80,13 @@ async function unlockFlow(): Promise<boolean> {
   let error = "";
   for (;;) {
     const passphrase = await askPassphrase(hasVault
-      ? { title: "Passphrase pour déverrouiller vos sessions", allowReset: true, error }
-      : { title: "Choisissez une passphrase (8 car. min.) pour chiffrer vos sessions. Elle ne peut pas être récupérée.", create: true, error });
+      ? { title: t("unlockTitle"), allowReset: true, error }
+      : { title: t("createTitle"), create: true, error });
     if (passphrase === null) return false;
 
     const res = await send({ action: "UNLOCK", passphrase });
     if (res?.success) return true;
-    error = res?.error || "Erreur de déverrouillage";
+    error = res?.error || t("unlockError");
   }
 }
 
@@ -96,7 +102,7 @@ async function call<M extends Message>(message: M) {
 }
 
 function errorText(res: { error?: string } | undefined, fallback: string): string {
-  if (res?.error === LOCKED) return "Sessions verrouillées";
+  if (res?.error === LOCKED) return t("locked");
   return res?.error || fallback;
 }
 
@@ -116,9 +122,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   cleanLogoutBtn.addEventListener("click", async () => {
     const response = await send({ action: "CLEAN_LOGOUT" });
     if (response?.success) {
-      showStatus("Déconnecté de SoundCloud", "success");
+      showStatus(t("loggedOut"), "success");
     } else {
-      showStatus(response?.error || "Erreur de déconnexion", "error");
+      showStatus(response?.error || t("logoutError"), "error");
     }
     loadAccounts();
   });
@@ -142,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function checkCurrentSoundCloudSession() {
   const response = await send({ action: "GET_CURRENT_SC_PROFILE" });
   if (response?.success && response.profile?.username && !accountNameInput.value) {
-    accountNameInput.placeholder = `Détecté : ${response.profile.username}`;
+    accountNameInput.placeholder = t("detected", response.profile.username);
   }
 }
 
@@ -151,46 +157,46 @@ async function handleSaveAccount() {
   const rawName = accountNameInput.value.trim();
 
   if (rawName.length > 50) {
-    showStatus("Nom trop long (max 50 car.)", "error");
+    showStatus(t("nameTooLong"), "error");
     return;
   }
 
   const sanitizedName = rawName.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
 
   saveBtn.disabled = true;
-  showStatus("Détection du profil SoundCloud...", "info");
+  showStatus(t("detecting"), "info");
 
   const response = await call({ action: "SAVE_ACTIVE_ACCOUNT", name: sanitizedName });
   saveBtn.disabled = false;
   if (response?.success) {
     accountNameInput.value = "";
-    showStatus(`Compte "${response.name}" enregistré`, "success");
+    showStatus(t("accountSaved", response.name), "success");
     loadAccounts();
   } else {
-    showStatus(errorText(response, "Erreur lors de la sauvegarde"), "error");
+    showStatus(errorText(response, t("saveError")), "error");
   }
 }
 
 // Basculer vers un compte
 async function switchToAccount(name: string) {
-  showStatus(`Bascule vers "${name}"...`, "info");
+  showStatus(t("switching", name), "info");
 
   const response = await call({ action: "SWITCH_ACCOUNT", accountName: name });
   if (response?.success) {
-    showStatus(`Actif : ${name}`, "success");
+    showStatus(t("activeStatus", name), "success");
     loadAccounts();
   } else {
-    showStatus(errorText(response, "Erreur lors de la bascule"), "error");
+    showStatus(errorText(response, t("switchError")), "error");
   }
 }
 
 // Supprimer un compte avec confirmation
 async function deleteAccount(name: string) {
-  if (!confirm(`Supprimer le compte "${name}" ?`)) return;
+  if (!confirm(t("deleteConfirm", name))) return;
 
   const response = await send({ action: "DELETE_ACCOUNT", name });
   if (response?.success) {
-    showStatus(`Compte "${name}" supprimé`, "success");
+    showStatus(t("accountDeleted", name), "success");
   }
   loadAccounts();
 }
@@ -200,7 +206,7 @@ async function deleteAccount(name: string) {
 async function handleExportAccounts() {
   const res = await call({ action: "EXPORT_ACCOUNTS" });
   if (!res?.success) {
-    showStatus(errorText(res, "Erreur lors de l'export"), "error");
+    showStatus(errorText(res, t("exportError")), "error");
     return;
   }
 
@@ -214,7 +220,7 @@ async function handleExportAccounts() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 
-  showStatus(`${res.count} profil(s) exporté(s) (chiffré)`, "success");
+  showStatus(t("exported", res.count), "success");
 }
 
 // Importer des profils depuis un fichier JSON
@@ -224,7 +230,7 @@ async function handleImportFile() {
   importFileInput.value = "";
   if (!file) return;
   if (file.size > MAX_IMPORT_BYTES) {
-    showStatus("Fichier trop volumineux", "error");
+    showStatus(t("fileTooLarge"), "error");
     return;
   }
 
@@ -232,22 +238,22 @@ async function handleImportFile() {
   try {
     data = JSON.parse(await file.text());
   } catch {
-    showStatus("Fichier JSON non valide", "error");
+    showStatus(t("invalidJson"), "error");
     return;
   }
 
   let passphrase: string | null = null;
   if ((data as { vault?: unknown } | null)?.vault) {
-    passphrase = await askPassphrase({ title: "Passphrase du fichier de sauvegarde" });
+    passphrase = await askPassphrase({ title: t("filePassTitle") });
     if (passphrase === null) return;
   }
 
   const res = await call({ action: "IMPORT_ACCOUNTS", file: data, passphrase });
   if (res?.success) {
-    showStatus(`${res.count} compte(s) importé(s)`, "success");
+    showStatus(t("imported", res.count), "success");
     loadAccounts();
   } else {
-    showStatus(errorText(res, "Format de fichier invalide"), "error");
+    showStatus(errorText(res, t("invalidFormat")), "error");
   }
 }
 
@@ -288,7 +294,7 @@ async function loadAccounts() {
     const emptyDiv = document.createElement("div");
     emptyDiv.className = "empty-state";
     const emptyText = document.createElement("p");
-    emptyText.textContent = "Aucun compte enregistré";
+    emptyText.textContent = t("noAccounts");
     emptyDiv.appendChild(emptyText);
     accountsList.appendChild(emptyDiv);
     return;
@@ -347,7 +353,7 @@ async function loadAccounts() {
     if (isActive) {
       const dot = document.createElement("span");
       dot.className = "active-dot";
-      dot.title = "Compte actif";
+      dot.title = t("activeAccount");
       infoDiv.appendChild(dot);
     }
 
@@ -357,14 +363,14 @@ async function loadAccounts() {
 
     const switchBtn = document.createElement("button");
     switchBtn.className = `btn btn-switch ${isActive ? "btn-active-state" : ""}`;
-    switchBtn.textContent = isActive ? "Actif" : "Activer";
-    switchBtn.setAttribute("aria-label", `Basculer vers ${name}`);
+    switchBtn.textContent = isActive ? t("active") : t("activate");
+    switchBtn.setAttribute("aria-label", t("switchToLabel", name));
     switchBtn.addEventListener("click", () => switchToAccount(name));
 
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "btn-delete";
-    deleteBtn.title = "Supprimer";
-    deleteBtn.setAttribute("aria-label", `Supprimer le compte ${name}`);
+    deleteBtn.title = t("delete");
+    deleteBtn.setAttribute("aria-label", t("deleteLabel", name));
     deleteBtn.appendChild(createTrashIcon());
     deleteBtn.addEventListener("click", () => deleteAccount(name));
 

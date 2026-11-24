@@ -1,0 +1,256 @@
+{
+  "extName": {
+    "message": "SoundCloud Switcher"
+  },
+  "extDescription": {
+    "message": "Switch between several SoundCloud accounts in one click."
+  },
+  "subtitle": {
+    "message": "Multi-account manager"
+  },
+  "namePlaceholder": {
+    "message": "Account name (or auto)..."
+  },
+  "save": {
+    "message": "Save"
+  },
+  "saveTitle": {
+    "message": "Save the active session"
+  },
+  "savedAccounts": {
+    "message": "Saved accounts"
+  },
+  "noAccounts": {
+    "message": "No saved accounts"
+  },
+  "logout": {
+    "message": "Log out"
+  },
+  "logoutTitle": {
+    "message": "Log out of the active session"
+  },
+  "openSoundcloud": {
+    "message": "SoundCloud"
+  },
+  "openSoundcloudTitle": {
+    "message": "Open SoundCloud"
+  },
+  "export": {
+    "message": "Export"
+  },
+  "exportTitle": {
+    "message": "Export an encrypted backup of your profiles"
+  },
+  "import": {
+    "message": "Import"
+  },
+  "importTitle": {
+    "message": "Restore profiles from a backup file"
+  },
+  "confirmPassPlaceholder": {
+    "message": "Confirm the passphrase"
+  },
+  "forgotPass": {
+    "message": "Forgot passphrase?"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "ok": {
+    "message": "OK"
+  },
+  "passMismatch": {
+    "message": "The passphrases do not match"
+  },
+  "resetConfirm": {
+    "message": "Delete all saved accounts and the passphrase? This cannot be undone."
+  },
+  "vaultReset": {
+    "message": "Vault reset"
+  },
+  "unlockTitle": {
+    "message": "Passphrase to unlock your sessions"
+  },
+  "createTitle": {
+    "message": "Choose a passphrase (8 characters min.) to encrypt your sessions. It cannot be recovered."
+  },
+  "unlockError": {
+    "message": "Unlock error"
+  },
+  "locked": {
+    "message": "Sessions locked"
+  },
+  "loggedOut": {
+    "message": "Logged out of SoundCloud"
+  },
+  "logoutError": {
+    "message": "Logout error"
+  },
+  "detected": {
+    "message": "Detected: $USERNAME$",
+    "placeholders": {
+      "username": {
+        "content": "$1"
+      }
+    }
+  },
+  "nameTooLong": {
+    "message": "Name too long (50 characters max.)"
+  },
+  "detecting": {
+    "message": "Detecting SoundCloud profile..."
+  },
+  "accountSaved": {
+    "message": "Account \"$NAME$\" saved",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "saveError": {
+    "message": "Error while saving"
+  },
+  "switching": {
+    "message": "Switching to \"$NAME$\"...",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "activeStatus": {
+    "message": "Active: $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "switchError": {
+    "message": "Error while switching"
+  },
+  "deleteConfirm": {
+    "message": "Delete the account \"$NAME$\"?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "accountDeleted": {
+    "message": "Account \"$NAME$\" deleted",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "exportError": {
+    "message": "Export error"
+  },
+  "exported": {
+    "message": "$COUNT$ profile(s) exported (encrypted)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "fileTooLarge": {
+    "message": "File too large"
+  },
+  "invalidJson": {
+    "message": "Invalid JSON file"
+  },
+  "filePassTitle": {
+    "message": "Backup file passphrase"
+  },
+  "imported": {
+    "message": "$COUNT$ account(s) imported",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "invalidFormat": {
+    "message": "Invalid file format."
+  },
+  "activeAccount": {
+    "message": "Active account"
+  },
+  "active": {
+    "message": "Active"
+  },
+  "activate": {
+    "message": "Switch"
+  },
+  "switchToLabel": {
+    "message": "Switch to $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "deleteLabel": {
+    "message": "Delete the account $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "passRequired": {
+    "message": "Passphrase required."
+  },
+  "passWrong": {
+    "message": "Wrong passphrase."
+  },
+  "passTooShort": {
+    "message": "Passphrase too short ($MIN$ characters min.).",
+    "placeholders": {
+      "min": {
+        "content": "$1"
+      }
+    }
+  },
+  "noSession": {
+    "message": "No active session detected. Log in to SoundCloud first."
+  },
+  "defaultAccountName": {
+    "message": "SoundCloud account"
+  },
+  "invalidName": {
+    "message": "Invalid name."
+  },
+  "nothingToExport": {
+    "message": "No profile to export"
+  },
+  "filePassWrong": {
+    "message": "Wrong passphrase for this file."
+  },
+  "noValidProfile": {
+    "message": "No valid profile found in the imported file."
+  },
+  "accountNotFound": {
+    "message": "The account \"$NAME$\" cannot be found.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "accountCorrupt": {
+    "message": "The account \"$NAME$\" is corrupted.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  }
+}
